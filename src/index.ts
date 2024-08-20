@@ -1,19 +1,24 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
-async function filePrinter(path: string):Promise<string> {
-    return await fs.promises.readdir(path);
+async function filePrinter(dirPath: string, indentation: number = 0): Promise<void> {
+    try {
+        const files = await fs.readdir(dirPath);
+
+        for (const file of files) {
+            const filePath = path.join(dirPath, file);
+            const stats = await fs.stat(filePath);
+
+            if (stats.isDirectory()) {
+                console.log(`${"    ".repeat(indentation)}📁${file}`);
+                await filePrinter(filePath, indentation + 1);
+            } else {
+                console.log(`${"    ".repeat(indentation)}📄${file}`);
+            }
+        }
+    } catch (err) {
+        throw err;
+    }
 }
 
-filePrinter("./node_modules").then((data) => {
-    for (const file of data) {
-        fs.stat(path.join(__dirname, file), (err: any, stats: any) => {
-            if (err) throw err;
-            console.log(stats.isDirectory());
-        });
-
-    }
-    console.log(data[0])
-    console.log(path.dirname(data[0]));
-})
-    .catch(e => console.log(e));
+filePrinter("./node_modules").catch(e => console.log(e));
