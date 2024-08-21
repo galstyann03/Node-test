@@ -20,4 +20,6 @@ async function filePrinter(dirPath: string, indentation: number = 0): Promise<vo
     }
 }
 
-filePrinter("./node_modules").catch(e => console.log(e));
+const relativePath: string = "./node_modules";
+
+filePrinter(path.resolve(relativePath)).catch(e => console.log(e));
